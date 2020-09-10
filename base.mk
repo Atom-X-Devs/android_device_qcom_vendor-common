@@ -67,7 +67,7 @@ BOARD_CHARGER_ENABLE_SUSPEND := true
 MSM_VIDC_TARGET_LIST := msm8974 msm8610 msm8226 apq8084 msm8916 msm8994 msm8909 msm8992 msm8996 msm8952 msm8937 msm8953 msm8998 apq8098_latv sdm660 sdm845 sdm710 qcs605 msmnile $(MSMSTEPPE) $(TRINKET) kona atoll lito
 
 #List of targets that use master side content protection
-MASTER_SIDE_CP_TARGET_LIST := msm8996 msm8998 sdm660 sdm845 apq8098_latv sdm710 qcs605 msmnile $(MSMSTEPPE) $(TRINKET) kona lito atoll
+MASTER_SIDE_CP_TARGET_LIST := msm8996 msm8998 sdm660 sdm845 apq8098_latv sdm710 qcs605 msmnile $(MSMSTEPPE) $(TRINKET) kona lito atoll holi bengal
 
 # Below projects/packages with LOCAL_MODULEs will be used by
 # PRODUCT_PACKAGES to build LOCAL_MODULEs that are tagged with
@@ -597,14 +597,6 @@ LIBQDUTILS := libqdutils
 #LIBQDMETADATA
 LIBQDMETADATA := libqdMetaData
 
-#LIBPOWER
-ifneq ($(TARGET_USES_NON_LEGACY_POWERHAL), true)
-LIBPOWER := power.qcom
-#LIBPOWER -- Add HIDL Packages
-LIBPOWER += android.hardware.power@1.0-impl
-LIBPOWER += android.hardware.power@1.0-service
-endif
-
 #LLVM for RenderScript
 #use qcom LLVM
 $(call inherit-product-if-exists, external/llvm/llvm-select.mk)
@@ -941,9 +933,6 @@ PRODUCT_PACKAGES += vcard
 # tcmiface for tcm support
 PRODUCT_PACKAGES += tcmiface
 
-# healthd libaray expanded for mode charger
-PRODUCT_PACKAGES += libhealthd.msm
-
 #intialise PRODUCT_PACKAGES_DEBUG list for debug modules
 PRODUCT_PACKAGES_DEBUG := init.qcom.testscripts.sh
 
@@ -1089,9 +1078,8 @@ PRODUCT_PACKAGES_DEBUG += \
 
 PRODUCT_PACKAGES += liboemaids_system
 PRODUCT_PACKAGES += liboemaids_vendor
+PRODUCT_PACKAGES += android.hardware.health@2.1-impl-qti
 PRODUCT_PACKAGES += android.hardware.health@2.1-service
-PRODUCT_PACKAGES += android.hardware.health@2.1-impl
-PRODUCT_PACKAGES += android.hardware.health@2.1-impl.recovery
 # framework detect libs
 PRODUCT_PACKAGES += libvndfwk_detect_jni.qti
 PRODUCT_PACKAGES += libqti_vndfwk_detect
