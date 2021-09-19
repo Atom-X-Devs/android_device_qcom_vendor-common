@@ -1,5 +1,5 @@
 # define flag to determine the kernel
-TARGET_KERNEL_VERSION ?= $(shell ls -1r kernel | grep "msm-*" | sed 's/msm-//' | head -1)
+TARGET_KERNEL_VERSION ?= $(subst /,,$(subst kernel/msm-,,$(dir $(wildcard kernel/msm-*/))))
 
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := vendor/qcom/opensource/core-utils/vendor_framework_compatibility_matrix.xml
 
@@ -598,14 +598,6 @@ LIBQDUTILS := libqdutils
 #LIBQDMETADATA
 LIBQDMETADATA := libqdMetaData
 
-#LIBPOWER
-ifneq ($(TARGET_USES_NON_LEGACY_POWERHAL), true)
-LIBPOWER := power.qcom
-#LIBPOWER -- Add HIDL Packages
-LIBPOWER += android.hardware.power@1.0-impl
-LIBPOWER += android.hardware.power@1.0-service
-endif
-
 #LLVM for RenderScript
 #use qcom LLVM
 $(call inherit-product-if-exists, external/llvm/llvm-select.mk)
@@ -827,6 +819,12 @@ PRODUCT_PACKAGES += \
     vendor.qti.hardware.servicetracker@1.2-impl \
     vendor.qti.hardware.servicetracker@1.2-service
 
+#memtrack HAL
+#PRODUCT_PACKAGES += \
+#    android.hardware.memtrack@1.0-impl \
+#    android.hardware.memtrack@1.0-service \
+#    memtrack.default
+
 #debugApp FDA
 PRODUCT_PACKAGES += FDA
 PRODUCT_PACKAGES += fda.script.rc
@@ -943,7 +941,8 @@ PRODUCT_PACKAGES_DEBUG := init.qcom.testscripts.sh
 #DebugUtils HAL
 PRODUCT_PACKAGES_DEBUG += \
     vendor.qti.hardware.debugutils@1.0-impl \
-    vendor.qti.hardware.debugutils@1.0-service
+    vendor.qti.hardware.debugutils@1.0-service \
+    PerfettoConfig.cfg
 
 #Add init.qcom.test.rc to PRODUCT_PACKAGES_DEBUG list
 PRODUCT_PACKAGES_DEBUG += init.qcom.test.rc
@@ -1094,11 +1093,22 @@ PRODUCT_PACKAGES += libvndfwk_detect_jni.qti
 PRODUCT_PACKAGES += libqti_vndfwk_detect
 PRODUCT_PACKAGES += libvndfwk_detect_jni.qti.vendor
 PRODUCT_PACKAGES += libqti_vndfwk_detect.vendor
+PRODUCT_PACKAGES += libqti_vndfwk_detect_system
+PRODUCT_PACKAGES += libqti_vndfwk_detect_vendor
+PRODUCT_PACKAGES += libvndfwk_detect_jni.qti_system
+PRODUCT_PACKAGES += libvndfwk_detect_jni.qti_vendor
 PRODUCT_PACKAGES += vndservicemanager
 PRODUCT_PACKAGES += vendor.qti.hardware.iop@2.0.vendor
 PRODUCT_PACKAGES += vendor.qti.hardware.perf@2.0.vendor
 PRODUCT_PACKAGES += vendor.qti.hardware.perf@2.1.vendor
 PRODUCT_PACKAGES += vendor.qti.hardware.perf@2.2.vendor
+
+SOONG_CONFIG_NAMESPACES += vendor_clean_up_java
+SOONG_CONFIG_vendor_clean_up_java += config output file allowlist
+SOONG_CONFIG_vendor_clean_up_java_config := $(CLEAN_UP_JAVA_IN_VENDOR)
+SOONG_CONFIG_vendor_clean_up_java_output := $(abspath out/target/product/)
+SOONG_CONFIG_vendor_clean_up_java_file := configs/vendor_java_soong_violator.txt
+SOONG_CONFIG_vendor_clean_up_java_allowlist := $(JAVA_IN_VENDOR_SOONG_WHITE_LIST)
 
 #soong namespace for qssi vs vendor differentiation
 SOONG_CONFIG_NAMESPACES += qssi_vs_vendor
